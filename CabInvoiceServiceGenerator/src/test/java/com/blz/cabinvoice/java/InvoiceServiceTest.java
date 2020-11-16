@@ -9,46 +9,32 @@ import org.junit.Test;
 public class InvoiceServiceTest {
 
 	static InvoiceService invoiceService;
+	static Ride[] rides;
+	static InvoiceSummary expectedInvoiceSummary;
 
 	@BeforeClass
 	public static void createInvoiceGeneratorObj() {
 		invoiceService = new InvoiceService();
+		rides = new Ride[] {
+					new Ride(2.0, 5, RideCategory.NORMAL),
+					new Ride(0.1, 1, RideCategory.PREMIUM)
+				};
+		expectedInvoiceSummary = new InvoiceSummary(2, 45);
 		System.out.println("Welcome to Cab Invoice Generator Program");
 	}
 
 	@Test
-	public void givenDistanceAndTime_ShouldReturnTotalFare() {
-		double distance = 2.0;
-		int time = 5;
-		double fare = invoiceService.calculateFare(distance, time);
-		Assert.assertEquals(25, fare, 0.0);
-	}
-
-	@Test
-	public void givenLessDistanceAndTime_ShouldReturnMinimumFare() {
-		double distance = 0.1;
-		int time = 1;
-		double fare = invoiceService.calculateFare(distance, time);
-		Assert.assertEquals(5, fare, 0.0);
-	}
-
-	@Test
 	public void givenMultipleRides_ShouldReturnInvoiceSummary() {
-		Ride[] rides = {
-					new Ride(2.0, 5),
-					new Ride(0.1, 1)
-				};
 		InvoiceSummary actualInvoiceSummary = invoiceService.calculateSummaryFare(Arrays.asList(rides));
-		InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(2, 30.0);
 		Assert.assertEquals(expectedInvoiceSummary, actualInvoiceSummary);
 	}
 
 	@Test
 	public void givenUserIdAndRide_ShouldReturnInvoiceSummary() {
-		invoiceService.addRides("abc", new Ride[] { new Ride(2.0, 5), new Ride(0.1, 1)});
-		invoiceService.addRides("def", new Ride[] { new Ride(5.0, 5), new Ride(0.1, 1)});
-		InvoiceSummary actualInvoiceSummary = invoiceService.getInvoiceSummary("def");
-		InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(2, 60);
+		invoiceService.addRides("def", new Ride[] { new Ride(5.0, 5, RideCategory.NORMAL), new Ride(0.1, 1, RideCategory.NORMAL)});
+		invoiceService.addRides("abc", rides);
+		InvoiceSummary actualInvoiceSummary = invoiceService.getInvoiceSummary("abc");
+		expectedInvoiceSummary = new InvoiceSummary(2, 45);
 		Assert.assertEquals(expectedInvoiceSummary, actualInvoiceSummary);
 	}
 }
